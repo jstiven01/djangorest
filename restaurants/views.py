@@ -1,22 +1,21 @@
 from django.shortcuts import render
-from django.http import HttpResponse
+from django.http import HttpResponse,HttpResponseRedirect
+from django.urls import reverse
+from .models import Restaurant,MenuItem
 
-
-
-#class Index(request):
-#    
-#        return HttpResponse("Hello World with classes")
-#def index(request):
-#    return HttpResponse("hello World")
-# Create your views here.
 
 def showRestaurants(request):
-    
-    return HttpResponse("Show all restaurants")
+    restaurants = Restaurant.objects.all()
+    return render(request, 'restaurants/restaurants.html', {'restaurants': restaurants})
+
 
 def newRestaurants(request):
-    
-    return HttpResponse("New restaurant")
+    if request.method == 'POST':
+        newRest = Restaurant(name = request.POST['newrest'])
+        newRest.save()
+        return HttpResponseRedirect(reverse('restaurants:showrestaurants'))
+    else:
+        return render(request,'restaurants/newrestaurant.html',{})
 
 def editRestaurant(request, restaurant_id):
     
