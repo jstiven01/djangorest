@@ -36,17 +36,43 @@ def deleteRestaurant(request, restaurant_id):
         return render(request,'restaurants/deleterestaurant.html', {'restaurant' : deletedRestaurant})
 
 def showMenu(request, restaurant_id):
-    
-    return HttpResponse("Show Menu %s" %restaurant_id)
+    restaurant = Restaurant.objects.get(id = restaurant_id)
+    items = MenuItem.objects.filter(restaurant_id = restaurant)
+    return render(request, 'restaurants/menu.html', {'restaurant':restaurant, 'items': items})
 
 def newMenuItem(request, restaurant_id):
-    
-    return HttpResponse("New menu item of %s" %restaurant_id)
+    restaurant = Restaurant.objects.get(id = restaurant_id)
+    if request.method == 'POST':
+        newMenuItem = MenuItem(name = request.POST['namemenu'], description = request.POST['descripmenu'],
+                               course = request.POST['coursemenu'], price = request.POST['pricemenu'],
+                               restaurant_id = restaurant)
+        newMenuItem.save()
+        return HttpResponseRedirect(reverse('restaurants:showmenu', args = [restaurant_id]))
+    else:
+        return render(request,'restaurants/newmenuitem.html', {'restaurant' :restaurant})
 
 def editMenuItem(request, restaurant_id, menu_id):
-    
-    return HttpResponse("Edit Menu Item %s of %s" % (menu_id ,restaurant_id))
+    restaurant = Restaurant.objects.get(id = restaurant_id)
+    editedMenu = MenuItem.objects.get(id = menu_id, restaurant_id = restaurant)
+    if request.method == 'POST':
+        if request.POST['namemenu']:
+            editedMenu.name = request.POST['namemenu']
+        if request.POST['descripmenu']:
+            editedMenu.description = request.POST['descripmenu']
+        if request.POST['coursemenu']:
+            editedMenu.course = request.POST['coursemenu']
+        if request.POST['pricemenu']:
+            editedMenu.price = request.POST['pricemenu']
+        editedMenu.save()
+        return HttpResponseRedirect(reverse('restaurants:showmenu', args = [restaurant_id]))
+    else:
+        return render(request,'restaurants/editmenuitem.html',{'restaurant' : restaurant, 'item' : editedMenu})
 
 def deleteMenuItem(request, restaurant_id, menu_id):
-    
-    return HttpResponse("Delete menu item %s of %s" % (menu_id, restaurant_id))
+    restaurant = Restaurant.objects.get(id = restaurant_id)
+    deletedMenu = MenuItem.objects.get(id = menu_id, restaurant_id = restaurant)
+    if request.method == 'POST':
+        deletedMenu.delete()
+        return HttpResponseRedirect(reverse('restaurants:showmenu', args = [restaurant_id]))
+    else:
+        return render(request,'restaurants/deletemenuitem.html',{'restaurant' : restaurant, 'item' : deletedMenu})
