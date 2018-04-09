@@ -2,6 +2,7 @@ from django.shortcuts import render
 from django.http import HttpResponse,HttpResponseRedirect
 from django.urls import reverse
 from .models import Restaurant,MenuItem
+from django.http import JsonResponse
 
 
 def showRestaurants(request):
@@ -76,3 +77,21 @@ def deleteMenuItem(request, restaurant_id, menu_id):
         return HttpResponseRedirect(reverse('restaurants:showmenu', args = [restaurant_id]))
     else:
         return render(request,'restaurants/deletemenuitem.html',{'restaurant' : restaurant, 'item' : deletedMenu})
+
+#Api Endpoints
+def showRestaurantsJSON(request):
+    restaurants = Restaurant.objects.all()
+    Restaurants = [restaurant.serialize for restaurant in restaurants]
+    return JsonResponse(data= Restaurants, safe= False)
+
+def showmenuJSON(request,restaurant_id):
+    restaurant = Restaurant.objects.get(id = restaurant_id)
+    items =  MenuItem.objects.filter(restaurant_id = restaurant)
+    itemsjson = [item.serialize for item in items]
+    return JsonResponse(data = itemsjson, safe = False)
+
+def showMenuItemJSON(request, restaurant_id, menu_id):
+    restaurant = Restaurant.objects.get(id = restaurant_id)
+    item = MenuItem.objects.get(id = menu_id, restaurant_id = restaurant)
+    itemjson = [item.serialize]
+    return JsonResponse(data= itemjson, safe= False)
