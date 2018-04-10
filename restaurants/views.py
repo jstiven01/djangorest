@@ -2,6 +2,7 @@ from django.shortcuts import render
 from django.http import HttpResponse,HttpResponseRedirect
 from django.urls import reverse
 from .models import Restaurant,MenuItem
+from django.contrib import messages
 from django.http import JsonResponse
 
 
@@ -14,6 +15,7 @@ def newRestaurants(request):
     if request.method == 'POST':
         newRest = Restaurant(name = request.POST['newrest'])
         newRest.save()
+        messages.add_message(request, messages.SUCCESS,'Restaurant was created')
         return HttpResponseRedirect(reverse('restaurants:showrestaurants'))
     else:
         return render(request,'restaurants/newrestaurant.html')
@@ -23,6 +25,7 @@ def editRestaurant(request, restaurant_id):
     if request.method == 'POST':
         editedRestaurant.name = request.POST['editrest']
         editedRestaurant.save()
+        messages.add_message(request,messages.SUCCESS, 'Restaurant was edited!')
         return HttpResponseRedirect(reverse('restaurants:showrestaurants'))
     else:
         return render(request,'restaurants/editrestaurant.html', {'restaurant': editedRestaurant})
@@ -32,6 +35,7 @@ def deleteRestaurant(request, restaurant_id):
     deletedRestaurant = Restaurant.objects.get(id = restaurant_id)
     if request.method == 'POST':
         deletedRestaurant.delete()
+        messages.add_message(request, messages.SUCCESS, 'Restaurant was deleted!')
         return HttpResponseRedirect(reverse('restaurants:showrestaurants'))
     else:
         return render(request,'restaurants/deleterestaurant.html', {'restaurant' : deletedRestaurant})
@@ -48,6 +52,7 @@ def newMenuItem(request, restaurant_id):
                                course = request.POST['coursemenu'], price = request.POST['pricemenu'],
                                restaurant_id = restaurant)
         newMenuItem.save()
+        messages.add_message(request, messages.SUCCESS, 'Menu item was created!')
         return HttpResponseRedirect(reverse('restaurants:showmenu', args = [restaurant_id]))
     else:
         return render(request,'restaurants/newmenuitem.html', {'restaurant' :restaurant})
@@ -65,6 +70,7 @@ def editMenuItem(request, restaurant_id, menu_id):
         if request.POST['pricemenu']:
             editedMenu.price = request.POST['pricemenu']
         editedMenu.save()
+        messages.add_message(request, messages.SUCCESS, 'Menu item was edited')
         return HttpResponseRedirect(reverse('restaurants:showmenu', args = [restaurant_id]))
     else:
         return render(request,'restaurants/editmenuitem.html',{'restaurant' : restaurant, 'item' : editedMenu})
@@ -74,6 +80,7 @@ def deleteMenuItem(request, restaurant_id, menu_id):
     deletedMenu = MenuItem.objects.get(id = menu_id, restaurant_id = restaurant)
     if request.method == 'POST':
         deletedMenu.delete()
+        messages.add_message(request, messages.SUCCESS, 'Menu item deleted')
         return HttpResponseRedirect(reverse('restaurants:showmenu', args = [restaurant_id]))
     else:
         return render(request,'restaurants/deletemenuitem.html',{'restaurant' : restaurant, 'item' : deletedMenu})

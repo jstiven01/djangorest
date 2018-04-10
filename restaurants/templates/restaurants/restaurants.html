@@ -6,6 +6,13 @@
 </head>
 <body>
 	<h1>RESTAURANTS</h1>
+	{% if messages %}
+	<ul>
+		{% for message in messages %}
+		<li>{{ message }}</li>
+		{% endfor %}
+	{% endif %}
+	</ul>
 		<a href="{% url 'restaurants:newrestaurant' %}">Create a New Restaurant</a>
 	{% for rest in restaurants %}
 		<h2>{{ rest.name }}</h2>

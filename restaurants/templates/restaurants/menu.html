@@ -6,6 +6,12 @@
 </head>
 <body>
 	<h1>{{ restaurant.name }}'s Menu</h1>
+	{% if messages %}
+	<ul>
+		{% for message in messages %}
+		<li>{{ message }}</li>
+		{% endfor %}
+	{% endif %}
 	<a href="{% url 'restaurants:newmenuitem' restaurant.id %}">Create a New Menu Item</a>
 	{% for item in items %}
 		<h2>{{ item.name }}</h2>
